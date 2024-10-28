@@ -54,9 +54,16 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      addWordPair();
+    }
+  };
+
   // XLSX 파일을 읽어와 wordList에 추가하는 함수
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
+    if(!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
       const data = new Uint8Array(event.target.result);
@@ -102,6 +109,8 @@ function App() {
   // };
   const renderTextWithHover = (text) => {
     if (wordList.length === 0) return text;
+    // 단어 리스트를 단어 길이 순서대로 정렬 (긴 단어가 우선 매칭)
+    const sortedWordList = [...wordList].sort((a, b) => b.word.length - a.word.length);
 
     // 오른쪽 리스트의 모든 단어로 정규식 패턴 생성
     const regex = new RegExp(`(${wordList.map((pair) => pair.word).join("|")})`, "gi");
@@ -111,7 +120,7 @@ function App() {
 
     return parts.map((part, index) => {
       // 하이라이트된 단어 여부를 확인
-      const pair = wordList.find((pair) => part.toLowerCase().includes(pair.word.toLowerCase()));
+      const pair = sortedWordList.find((pair) => part.toLowerCase().includes(pair.word.toLowerCase()));
       console.log(pair)
       const isHighlighted = !!pair;
 
@@ -121,7 +130,7 @@ function App() {
           onMouseOver={() => pair && setCurrentTranslation(pair.translation)} // 호버 시 번역어 설정
           onMouseOut={() => setCurrentTranslation("")} // 호버 해제 시 번역어 초기화
           style={{
-            backgroundColor: isHighlighted ? "yellow" : "transparent",
+            backgroundColor: isHighlighted ? "lightgreen" : "transparent",
             position: "relative",
             margin: "0 2px",
           }}
@@ -153,7 +162,7 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ alignItems: "flex-start", justifyContent: "space-between", display: "flex", padding: "20px", height:"auto" }}>
+    <div className="App" style={{ alignItems: "flex-start", justifyContent: "space-between", display: "flex", margin: "20px", height:"auto" }}>
       {/* 왼쪽 - 영어 텍스트 입력 */}
       <div style={{ flex: 3, width: "100%", 
             height: "100vh", overflowY: "scroll"}}>
@@ -168,14 +177,17 @@ function App() {
         ></textarea>
         <div style={{
             marginTop: "20px",
+            marginLeft: "20px",
+            marginRight: "20px",
             padding: "10px",
             background: "#f9f9f9",
             borderRadius: "5px",
             overflowY: "scroll",
-            height: "500px",
-            width: "90%", // 고정 너비
+            height: "400px",
+            // width: "90%", // 고정 너비
             wordWrap: "break-word", // 긴 단어 줄바꿈
             whiteSpace: "pre-wrap", // 줄바꿈 적용
+            textAlign: "justify",
           }}>
           {renderTextWithHover(text)}
         </div>
@@ -189,6 +201,7 @@ function App() {
           placeholder="Enter English word"
           value={currentWord}
           onChange={(e) => setCurrentWord(e.target.value)}
+          onKeyDown={handleKeyPress} // Enter 키 입력 이벤트 추가
           style={{ marginRight: "10px", marginBottom: "10px" }}
         />
         <input
@@ -196,29 +209,33 @@ function App() {
           placeholder="Enter Korean translation"
           value={currentTranslation}
           onChange={(e) => setCurrentTranslation(e.target.value)}
+          onKeyDown={handleKeyPress} // Enter 키 입력 이벤트 추가
           style={{ marginRight: "10px", marginBottom: "10px" }}
         />
         <button onClick={addWordPair}>Add</button>
-
+        
         {/* 리스트 초기화 버튼 */}
-        <button onClick={clearWordList} style={{ display: "block", marginTop: "10px" }}>
+        <button onClick={clearWordList} >
           Clear List
         </button>
 
-        {/* 엑셀 파일 저장 버튼 */}
-        <button onClick={saveToXLSX} style={{ marginTop: "10px" }}>
-          Save as XLSX
-        </button>
+        <div className="xlsx-control" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+          {/* 엑셀 파일 저장 버튼 */}
+          <button onClick={saveToXLSX} style={{ marginTop: "10px"}}>
+            엑셀 파일 만들기
+          </button>
 
-        {/* 엑셀 파일 업로드 버튼 */}
-        <input
-          type="file"
-          accept=".xlsx"
-          onChange={handleFileUpload}
-          style={{ display: "block", marginTop: "10px" }}
-        />
+          {/* 엑셀 파일 업로드 버튼 */}
+          <input
+            type="file"
+            accept=".xlsx"
+            onChange={handleFileUpload}
+            style={{ display: "block", marginTop: "10px"}}
+          />
+        </div>
+        
 
-        <ul style={{ listStyleType: "none", padding: "10px", background: "#f1f1f1", borderRadius: "5px", marginTop: "20px" }}>
+        <ul style={{ listStyleType: "none", padding: "10px", background: "#f1f1f1", borderRadius: "5px", marginTop: "20px", height: "500px", overflowY: "scroll" }}>
           {wordList.map((pair, index) => (
             <li key={index} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>
