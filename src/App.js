@@ -10,6 +10,8 @@ function App() {
   const [currentWord, setCurrentWord] = useState(""); // 단일 단어 입력
   const [currentTranslation, setCurrentTranslation] = useState(""); // 번역어 입력
   const [currentNotice, setCurrentNotice] = useState("");
+  const [fontSize, setFontSize] = useState(16); // 기본 폰트 사이즈 16px
+  const collectionName = "wordlist";
 
   const englishWordRef = useRef(null);
   // 텍스트 변경 시 호출
@@ -36,7 +38,7 @@ function App() {
   // 리스트 초기화 함수
   const clearWordList = () => {
     setWordList([]); // 단어 리스트 초기화
-    deleteAllDocuments("wordlist")
+    deleteAllDocuments(collectionName)
   };
 
   const saveToXLSX = () => {
@@ -104,9 +106,8 @@ function App() {
   // Firestore에서 단어 리스트 가져오는 함수
   const fetchWordListFromFirestore = async () => {
     try {
-      // const wordlistRef = collection(db, "wordlist");
       const q = query(
-        collection(db, "wordlist"),
+        collection(db, collectionName),
         orderBy("Timestamp", "desc") // Timestamp 필드에 대해 내림차순 정렬
       );
       const querySnapshot = await getDocs(q);
@@ -174,7 +175,7 @@ function App() {
 
     try {
       // Firestore에서 동일한 문서 ID 삭제
-      const wordDocRef = doc(collection(db, "wordlist"), wordToDelete);
+      const wordDocRef = doc(collection(db, collectionName), wordToDelete);
       await deleteDoc(wordDocRef);
       console.log(`Deleted ${wordToDelete} from Firestore`);
     } catch (error) {
@@ -200,7 +201,7 @@ function App() {
     if (wordList.length === 0){
       const paragraphs = text.split("\n").map((paragraph, paragraphIndex)=>{
         return (
-          <p key={paragraphIndex} style={{ marginBottom: "1em", whiteSpace: "pre-wrap"}}>
+          <p key={paragraphIndex} style={{ marginBottom: "1em", whiteSpace: "pre-wrap", fontSize: `${fontSize}px`}}>
             {paragraph}
           </p>
         );
@@ -228,9 +229,10 @@ function App() {
             onMouseOver={() => pair && setCurrentTranslation(pair.translation)} // 호버 시 번역어 설정
             onMouseOut={() => setCurrentTranslation("")} // 호버 해제 시 번역어 초기화
             style={{
-              backgroundColor: isHighlighted ? "lightgreen" : "transparent",
+              backgroundColor: isHighlighted ? "rgb(255, 204, 204)" : "transparent",
               position: "relative",
               margin: "0 2px",
+              fontSize: `${fontSize}px`, // 폰트 사이즈 적용
             }}
           >
             {part}
@@ -258,7 +260,7 @@ function App() {
         );
       });
       return (
-        <p key={paragraphIndex} style={{ marginBottom: "1em", whiteSpace: "pre-wrap"}}>
+        <p key={paragraphIndex} style={{ marginBottom: "1em", whiteSpace: "pre-wrap", fontSize: `${fontSize}px`}}>
           {words}
         </p>
       );
@@ -268,7 +270,7 @@ function App() {
 
   const saveWordToFirestore = async (wordPairList) => {
     try {
-      const wordlistRef = collection(db, "wordlist");
+      const wordlistRef = collection(db, collectionName);
   
       // wordPairList의 각 wordPair를 Firestore에 저장
       await Promise.all(
@@ -289,7 +291,7 @@ function App() {
 
   const saveWordsToFirestore = async () => {
     try {
-      const wordListRef = collection(db, "wordlist");
+      const wordListRef = collection(db, collectionName);
 
       // 모든 단어 리스트를 Firestore에 저장
       await Promise.all(
@@ -320,90 +322,112 @@ function App() {
   // }, [wordList]);
 
   return (
-    <div>
-      <header style={{width: "100%", height: "auto", justifyContent: "space-between", marginLeft: "20px"}}><h1>{currentNotice}</h1></header>
-      <div className="App" style={{ alignItems: "flex-start", justifyContent: "space-between", display: "flex", margin: "20px", height:"auto" }}>
-        {/* 왼쪽 - 영어 텍스트 입력 */}
-        <div style={{ flex: 3, width: "100%", 
-              height: "100vh", overflowY: "scroll"}}>
-          <h2>English Text Input</h2>
+    <div className="app-container">
+      {/* 네비게이션 바 추가 */}
+      {/* <nav className="navbar">
+        <div className="nav-logo">
+          <button className="menu-button">☰</button>
+        </div>
+        <div className="nav-links">
+          <a href="#" className="active">HOME</a>
+          <a href="#">NEWS</a>
+          <a href="#">WALLET</a>
+        </div>
+      </nav> */}
+
+      {/* 헤더 섹션 수정 */}
+      <div className="hero-section">
+        <div className="hero-content">
+          <h1 className="hero-title">{currentNotice}</h1>
+          {/* <p className="hero-subtitle">Digital Assets Fan Community</p>
+          <p className="hero-description">
+            High-quality community platform based on the certificate economy
+          </p>
+          <button className="details-button">DETAILS</button> */}
+        </div>
+      </div>
+
+      {/* 기존 메인 컨텐츠 스타일 수정 */}
+      <div className="main-content">
+        <div className="text-input-section">
+          <h2 className="section-title">English Text Input</h2>
+          <div className="font-size-controls" style={{ 
+            marginBottom: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <button 
+              className="action-button"
+              onClick={() => setFontSize(prev => Math.max(8, prev - 2))}
+            >
+              글자 작게
+            </button>
+            <span>{fontSize}px</span>
+            <button 
+              className="action-button"
+              onClick={() => setFontSize(prev => Math.min(64, prev + 2))}
+            >
+              글자 크게
+            </button>
+          </div>
           <textarea
+            className="text-input"
             rows="10"
-            style={{ width: "90%"}}
             value={text}
-            wrap="hard"
             onChange={handleTextChange}
             placeholder="Enter English text here..."
           ></textarea>
-          <div style={{
-              marginTop: "20px",
-              marginLeft: "20px",
-              marginRight: "20px",
-              padding: "10px",
-              background: "#f9f9f9",
-              borderRadius: "5px",
-              overflowY: "scroll",
-              height: "400px",
-              // width: "90%", // 고정 너비
-              wordWrap: "break-word", // 긴 단어 줄바꿈
-              whiteSpace: "pre-wrap", // 줄바꿈 적용
-              textAlign: "justify",
-            }}>
+          <div className="text-display">
             {renderTextWithHover(text)}
           </div>
         </div>
 
-        {/* 오른쪽 - 단어와 번역어 리스트 */}
-        <div style={{ flex: 2 }}>
-          <h2>Word Translation List</h2>
-          <input
-            ref={englishWordRef} // ref 설정
-            type="text"
-            placeholder="Enter English word"
-            value={currentWord}
-            onChange={(e) => setCurrentWord(e.target.value)}
-            onKeyDown={handleKeyPress} // Enter 키 입력 이벤트 추가
-            style={{ marginRight: "10px", marginBottom: "10px" }}
-          />
-          <input
-            type="text"
-            placeholder="Enter Korean translation"
-            value={currentTranslation}
-            onChange={(e) => setCurrentTranslation(e.target.value)}
-            onKeyDown={handleKeyPress} // Enter 키 입력 이벤트 추가
-            style={{ marginRight: "10px", marginBottom: "10px" }}
-          />
-          <button onClick={addWordPair}>Add</button>
-          
-          {/* 리스트 초기화 버튼 */}
-          <button onClick={clearWordList} >
-            Clear List
-          </button>
+        <div className="word-list-section">
+          <h2 className="section-title">Word Translation List</h2>
+          <div className="input-group">
+            <input
+              ref={englishWordRef}
+              type="text"
+              className="word-input"
+              placeholder="Enter English word"
+              value={currentWord}
+              onChange={(e) => setCurrentWord(e.target.value)}
+              onKeyDown={handleKeyPress}
+            />
+            <input
+              type="text"
+              className="word-input"
+              placeholder="Enter Korean translation"
+              value={currentTranslation}
+              onChange={(e) => setCurrentTranslation(e.target.value)}
+              onKeyDown={handleKeyPress}
+            />
+            <button className="action-button" onClick={addWordPair}>Add</button>
+            <button className="action-button" onClick={clearWordList}>Clear List</button>
+          </div>
 
-          <div className="xlsx-control" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-            {/* 엑셀 파일 저장 버튼 */}
-            <button onClick={saveToXLSX} style={{ marginTop: "10px"}}>
-              엑셀 파일 만들기
+          <div className="file-controls">
+            <button className="action-button" onClick={saveToXLSX}>
+              Export to Excel
             </button>
-
-            {/* 엑셀 파일 업로드 버튼 */}
             <input
               type="file"
               accept=".xlsx"
               onChange={handleFileUpload}
-              style={{ display: "block", marginTop: "10px"}}
+              className="file-input"
             />
           </div>
-          
 
-          <ul style={{ listStyleType: "none", padding: "10px", background: "#f1f1f1", borderRadius: "5px", marginTop: "20px", height: "500px", overflowY: "scroll" }}>
+          <ul className="word-list">
             {wordList.map((pair, index) => (
-              <li key={index} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span>
-                  {pair.word} - {pair.translation}
-                </span>
-                <button onClick={() => deleteWordPair(index)} style={{ marginLeft: "10px" }}>
-                  Delete
+              <li key={index} className="word-item">
+                <span>{pair.word} - {pair.translation}</span>
+                <button 
+                  className="delete-button"
+                  onClick={() => deleteWordPair(index)}
+                >
+                  ×
                 </button>
               </li>
             ))}
