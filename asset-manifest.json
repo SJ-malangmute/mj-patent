@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/mj-patent/static/css/main.626e80a6.css",
-    "main.js": "/mj-patent/static/js/main.a891dc79.js",
+    "main.css": "/mj-patent/static/css/main.45929905.css",
+    "main.js": "/mj-patent/static/js/main.99292a7f.js",
     "static/js/453.22e18eea.chunk.js": "/mj-patent/static/js/453.22e18eea.chunk.js",
     "index.html": "/mj-patent/index.html",
-    "main.626e80a6.css.map": "/mj-patent/static/css/main.626e80a6.css.map",
-    "main.a891dc79.js.map": "/mj-patent/static/js/main.a891dc79.js.map",
+    "main.45929905.css.map": "/mj-patent/static/css/main.45929905.css.map",
+    "main.99292a7f.js.map": "/mj-patent/static/js/main.99292a7f.js.map",
     "453.22e18eea.chunk.js.map": "/mj-patent/static/js/453.22e18eea.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.626e80a6.css",
-    "static/js/main.a891dc79.js"
+    "static/css/main.45929905.css",
+    "static/js/main.99292a7f.js"
   ]
 }
