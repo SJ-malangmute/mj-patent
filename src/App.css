@@ -86,7 +86,7 @@ body {
 
 /* 히어로 섹션 스타일 */
 .hero-section {
-  padding: 4rem 2rem;
+  padding: 2rem 2rem;
   color: rgb(255, 255, 255);
 }
 
@@ -126,12 +126,13 @@ body {
   background: white;
   border-radius: 1rem;
   margin: 1rem;
-  flex-wrap: wrap;
+  height: 70vh;
 }
 
 .text-input-section {
   flex: 2 1 500px;
   min-width: 300px;
+  height: 70%;
 }
 
 .word-list-section {
@@ -144,8 +145,16 @@ body {
   margin-bottom: 1rem;
 }
 
-.text-input, .word-input {
-  width: 100%;
+.text-input{
+  width: 90%;
+  height: 20px;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.word-input {
   padding: 0.8rem;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
@@ -156,7 +165,8 @@ body {
   background: #f8f9fa;
   padding: 1rem;
   border-radius: 0.5rem;
-  height: 400px;
+  width: 90%;
+  height: 100%;
   overflow-y: auto;
 }
 
