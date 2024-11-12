@@ -11,7 +11,9 @@ function App() {
   const [currentTranslation, setCurrentTranslation] = useState(""); // 번역어 입력
   const [currentNotice, setCurrentNotice] = useState("");
   const [fontSize, setFontSize] = useState(16); // 기본 폰트 사이즈 16px
+  const [currentGif, setCurrentGif] = useState("");
   const collectionName = "wordlist";
+  const gifCollectionName = "gifstorage";
 
   const englishWordRef = useRef(null);
   // 텍스트 변경 시 호출
@@ -147,10 +149,27 @@ function App() {
     }
   }
 
+  const fetchGifFromFirestore = async () => {
+    try {
+      const gifDocRef = collection(db, gifCollectionName);
+      const gifDoc = await getDocs(gifDocRef);
+      const gifFromFirestore = gifDoc.docs.map((doc) => ({
+        url: doc.data().url
+      }));
+      
+      // 랜덤 인덱스 생성 (0 ~ 배열 길이-1 사이의 정수)
+      const randomIndex = Math.floor(Math.random() * gifFromFirestore.length);
+      setCurrentGif(gifFromFirestore[randomIndex].url);
+    } catch (error) {
+      console.error("Error fetching gif from Firestore:", error);
+    }
+  }
+
   // 페이지 시작 시 단어 리스트 가져오기
   useEffect(() => {
     fetchWordListFromFirestore();
     fetchNoticeFromFirestore();
+    fetchGifFromFirestore();
   }, []);
 
   const deleteAllDocuments = async (collectionName) => {
@@ -336,14 +355,19 @@ function App() {
       </nav> */}
 
       {/* 헤더 섹션 수정 */}
-      <div className="hero-section">
-        <div className="hero-content">
+      <div className="nav-section">
+        <div className="hero-section">
+          <div className="hero-content">
           <h1 className="hero-title">{currentNotice}</h1>
           {/* <p className="hero-subtitle">Digital Assets Fan Community</p>
           <p className="hero-description">
             High-quality community platform based on the certificate economy
           </p>
-          <button className="details-button">DETAILS</button> */}
+            <button className="details-button">DETAILS</button> */}
+          </div>
+        </div>
+        <div className="dog-container">
+          <img src={currentGif} alt="귀여운 강아지"/>
         </div>
       </div>
 
